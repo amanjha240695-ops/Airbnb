@@ -1,0 +1,579 @@
+/* ==========================================================================
+   Navbar Header & Main Container
+   ========================================================================== */
+.navbar-header {
+  border-bottom: 1px solid var(--border-color, #ebebeb);
+  position: sticky;
+  top: 0;
+  background-color: #ffffff;
+  z-index: 1000;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+  position: relative;
+}
+
+/* Brand Logo */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary, #ff385c);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.navbar-logo:hover {
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   Central Floating Search Pill & Wrapper
+   ========================================================================== */
+.search-pill-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navbar-search-pill {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color, #dddddd);
+  border-radius: 40px;
+  padding: 8px 8px 8px 18px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  gap: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  background-color: #ffffff;
+  transition: box-shadow 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
+  user-select: none;
+}
+
+.navbar-search-pill:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.navbar-search-pill.pill-expanded {
+  border-color: var(--primary, #ff385c);
+  box-shadow: 0 4px 18px rgba(255, 56, 92, 0.18);
+}
+
+.pill-segment {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.pill-title {
+  color: var(--text-main, #222222);
+}
+
+.active-pill-text {
+  color: var(--primary, #ff385c);
+  font-weight: 700;
+}
+
+.search-divider {
+  color: var(--border-color, #dddddd);
+  user-select: none;
+}
+
+.search-muted-text {
+  color: var(--text-muted, #717171);
+  font-weight: normal;
+}
+
+.search-icon-circle {
+  background-color: var(--primary, #ff385c);
+  color: #ffffff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.search-icon-circle:hover {
+  transform: scale(1.05);
+}
+
+/* ==========================================================================
+   Interactive Search Popover Panel
+   ========================================================================== */
+.search-popover-panel {
+  position: absolute;
+  top: 58px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 440px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16), 0 0 1px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border-color, #ebebeb);
+  padding: 18px 20px;
+  z-index: 1050;
+  animation: fadeInPopover 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInPopover {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.popover-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+}
+
+.popover-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted, #717171);
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.popover-tab-btn.tab-active {
+  background-color: var(--bg-light, #f7f7f7);
+  color: var(--text-main, #222222);
+}
+
+.segment-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main, #222222);
+  margin-bottom: 8px;
+}
+
+.search-input-field-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted, #717171);
+}
+
+.custom-search-input {
+  width: 100%;
+  padding: 10px 36px 10px 40px;
+  border: 1px solid var(--border-color, #dddddd);
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.custom-search-input:focus {
+  border-color: var(--primary, #ff385c);
+}
+
+.clear-field-btn {
+  position: absolute;
+  right: 10px;
+  background: var(--bg-light, #eeeeee);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.quick-cities-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.quick-label {
+  font-size: 12px;
+  color: var(--text-muted, #717171);
+}
+
+.city-chip {
+  background-color: var(--bg-light, #f7f7f7);
+  border: 1px solid var(--border-color, #ebebeb);
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text-main, #333333);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.city-chip:hover,
+.city-chip.chip-active {
+  background-color: var(--primary, #ff385c);
+  color: #ffffff;
+  border-color: var(--primary, #ff385c);
+}
+
+/* Date Pickers */
+.dates-inputs-row {
+  display: flex;
+  gap: 12px;
+}
+
+.date-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.date-label-sub {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted, #717171);
+  margin-bottom: 4px;
+}
+
+.custom-date-input {
+  padding: 8px 10px;
+  border: 1px solid var(--border-color, #dddddd);
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+}
+
+.custom-date-input:focus {
+  border-color: var(--primary, #ff385c);
+}
+
+/* Guest Counters & Pets Toggle */
+.counter-row,
+.pets-toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.counter-row {
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
+}
+
+.sub-hint {
+  font-size: 12px;
+  color: var(--text-muted, #717171);
+  margin: 2px 0 0;
+}
+
+.counter-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.counter-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color, #dddddd);
+  background: #ffffff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.counter-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.counter-count {
+  font-size: 15px;
+  font-weight: 600;
+  min-width: 18px;
+  text-align: center;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #cccccc;
+  transition: 0.25s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #ffffff;
+  transition: 0.25s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--primary, #ff385c);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.popover-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-color, #f0f0f0);
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.popover-clear-btn {
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  color: var(--text-main, #222222);
+  cursor: pointer;
+}
+
+.popover-submit-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary, #ff385c);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.popover-submit-btn:hover {
+  transform: scale(1.02);
+}
+
+/* ==========================================================================
+   Actions & Profile Dropdown (Fixing the layout issue)
+   ========================================================================== */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative; /* Anchor point for the absolute dropdown */
+  flex-shrink: 0;
+}
+
+.host-link-btn {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-main, #222222);
+  text-decoration: none;
+  padding: 10px 14px;
+  border-radius: 22px;
+  transition: background-color 0.2s ease;
+}
+
+.host-link-btn:hover {
+  background-color: var(--bg-light, #f7f7f7);
+}
+
+.admin-portal-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e7e34;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background-color: #eafaf1;
+  transition: background-color 0.2s ease;
+}
+
+.admin-portal-link:hover {
+  background-color: #d4f4e2;
+}
+
+/* User Menu Trigger Pill */
+.user-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border-color, #dddddd);
+  padding: 5px 8px 5px 12px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+  background-color: #ffffff;
+}
+
+.user-menu-btn:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.user-avatar-circle {
+  background-color: var(--text-muted, #717171);
+  color: #ffffff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Dropdown Menu Container (Fixed Absolute Overlay) */
+.user-dropdown-menu {
+  position: absolute !important;
+  top: 54px !important;
+  right: 0 !important;
+  width: 230px !important;
+  background-color: #ffffff !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid var(--border-color, #ebebeb) !important;
+  overflow: hidden !important;
+  z-index: 2000 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 8px 0 !important;
+  animation: fadeInMenu 0.15s ease-out;
+}
+
+@keyframes fadeInMenu {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-user-info {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-color, #ebebeb);
+  font-size: 13px;
+}
+
+.dropdown-user-email {
+  color: var(--text-muted, #717171);
+  font-size: 12px;
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+.dropdown-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 10px 16px !important;
+  font-size: 14px !important;
+  color: var(--text-main, #222222) !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  width: 100% !important;
+  text-align: left !important;
+  transition: background-color 0.15s ease;
+}
+
+.dropdown-item:hover {
+  background-color: var(--bg-light, #f7f7f7) !important;
+}
+
+.dropdown-divider {
+  border-top: 1px solid var(--border-color, #ebebeb);
+  margin: 6px 0;
+}
+
+.logout-item {
+  color: #b81c1c !important;
+}
+
+.logout-item:hover {
+  background-color: #fff2f2 !important;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 768px) {
+  .search-pill-wrapper {
+    display: none;
+  }
+  .host-link-btn {
+    display: none;
+  }
+}

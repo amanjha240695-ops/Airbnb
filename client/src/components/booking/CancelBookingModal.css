@@ -1,0 +1,350 @@
+.cancel-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3500;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.cancel-modal-card {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 580px;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.cancel-modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #ebebeb;
+  position: relative;
+}
+
+.warning-icon-badge {
+  background-color: #fff4e5;
+  color: #d97706;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cancel-modal-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #222222;
+  margin: 0 0 4px;
+}
+
+.cancel-modal-sub {
+  font-size: 13px;
+  color: #717171;
+  margin: 0;
+}
+
+.modal-close-icon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #717171;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.modal-close-icon:hover {
+  background-color: #f0f0f0;
+  color: #222222;
+}
+
+.cancel-details-body {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stay-cancel-preview {
+  background-color: #f7f7f7;
+  padding: 14px 16px;
+  border-radius: 12px;
+}
+
+.stay-cancel-preview strong {
+  display: block;
+  font-size: 15px;
+  color: #222222;
+}
+
+.stay-cancel-preview p {
+  font-size: 13px;
+  color: #717171;
+  margin: 2px 0 6px;
+}
+
+.stay-cancel-dates {
+  font-size: 12px;
+  font-weight: 600;
+  color: #222222;
+}
+
+.refund-summary-box {
+  border: 1px solid #d4edda;
+  background-color: #f6fff8;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.refund-summary-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1e7e34;
+  margin-bottom: 12px;
+}
+
+.refund-check-icon {
+  color: #1e7e34;
+}
+
+.refund-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13.5px;
+  color: #444444;
+  margin-bottom: 6px;
+}
+
+.text-free {
+  color: #1e7e34;
+  font-weight: 600;
+}
+
+.refund-divider {
+  height: 1px;
+  background-color: #e5e5e5;
+  margin: 10px 0;
+}
+
+.total-refund-row {
+  font-size: 15px;
+  margin-bottom: 0;
+}
+
+.refund-amount-highlight {
+  font-size: 18px;
+  color: #1e7e34;
+}
+
+.refund-meta-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  color: #717171;
+  line-height: 1.45;
+}
+
+.refund-meta-note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #222222;
+}
+
+.cancel-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid #ebebeb;
+  background-color: #fafafa;
+}
+
+.btn-keep-stay {
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #222222;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-keep-stay:hover {
+  background-color: #f0f0f0;
+}
+
+.btn-confirm-cancel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #b81c1c;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-confirm-cancel:hover {
+  background-color: #991414;
+}
+
+.spinner-icon {
+  animation: spin 1s linear infinite;
+}
+
+.receipt-actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #ebebeb;
+}
+
+.receipt-print-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.receipt-print-btn:hover {
+  background-color: #222222;
+  color: #ffffff;
+}
+
+.cancellation-badge {
+  background-color: #fef2f2;
+  color: #b81c1c;
+  border: 1px solid #fecaca;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.receipt-headline {
+  font-size: 22px;
+  font-weight: 800;
+  color: #222222;
+  margin: 0 0 4px;
+}
+
+.receipt-sub-id {
+  font-size: 13px;
+  color: #717171;
+  margin: 0;
+}
+
+.cancellation-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.refund-math-table h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  color: #717171;
+  margin: 0 0 10px;
+}
+
+.receipt-guarantee-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #166534;
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.receipt-footer-close {
+  padding: 16px 24px;
+  background-color: #fafafa;
+  border-top: 1px solid #ebebeb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-done {
+  background-color: #222222;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .receipt-printable-area,
+  .receipt-printable-area * {
+    visibility: visible;
+  }
+  .cancel-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    padding: 0;
+  }
+  .cancel-modal-card {
+    box-shadow: none;
+    border: none;
+    max-width: 100%;
+  }
+  .no-print {
+    display: none !important;
+  }
+}

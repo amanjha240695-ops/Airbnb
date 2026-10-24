@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Airbnb Clone - Razorpay Test Checkout</title>
+  <!-- Razorpay Official Checkout SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      width: 440px;
+      box-sizing: border-box;
+    }
+    h2 { margin-top: 0; color: #ff385c; }
+    label { display: block; margin-top: 14px; font-weight: 600; font-size: 13px; color: #444; }
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 13px;
+    }
+    button {
+      width: 100%;
+      background: #ff385c;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 22px;
+      transition: background 0.2s;
+    }
+    button:hover { background: #e00b41; }
+    button:disabled { background: #cccccc; cursor: not-allowed; }
+    #status {
+      margin-top: 18px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: none;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+    .info { background: #f0f7ff; color: #0056b3; border: 1px solid #b8daff; }
+    .success { background: #e6f9e6; color: #1e7e34; border: 1px solid #b8e6b8; }
+    .error { background: #ffe6e6; color: #b81c1c; border: 1px solid #ffb3b3; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Book Stay & Pay</h2>
+    <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+      Secure checkout powered by Razorpay Sandbox Test Mode.
+    </p>
+
+    <label for="bookingId">Booking ID</label>
+    <input type="text" id="bookingId" placeholder="Waiting for booking ID..." />
+
+    <label for="token">Guest JWT Token</label>
+    <input type="password" id="token" placeholder="Bearer Token" />
+
+    <button id="payBtn" onclick="initiatePayment()">Pay with Razorpay</button>
+
+    <div id="status"></div>
+  </div>
+
+  <script>
+    const statusBox = document.getElementById("status");
+    const payBtn = document.getElementById("payBtn");
+
+    function setStatus(msg, type = "info") {
+      statusBox.style.display = "block";
+      statusBox.className = type;
+      statusBox.innerText = msg;
+    }
+
+    // Auto-extract URL Query Params passed from React
+    window.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const qBookingId = urlParams.get("bookingId");
+      const qToken = urlParams.get("token");
+
+      if (qBookingId) document.getElementById("bookingId").value = qBookingId;
+      if (qToken) document.getElementById("token").value = qToken;
+
+      // If both parameters exist, trigger payment automatically
+      if (qBookingId && qToken) {
+        initiatePayment();
+      }
+    });
+
+    async function initiatePayment() {
+      const bookingId = document.getElementById("bookingId").value.trim();
+      const token = document.getElementById("token").value.trim();
+
+      if (!bookingId || !token) {
+        alert("Please provide both Booking ID and Guest Token.");
+        return;
+      }
+
+      payBtn.disabled = true;
+      setStatus("Initializing Razorpay order on server...", "info");
+
+      try {
+        // 1. Request Order Creation from Backend
+        const orderRes = await fetch("http://localhost:5000/api/payments/create-order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ bookingId })
+        });
+
+        const orderData = await orderRes.json();
+
+        if (!orderRes.ok || !orderData.success) {
+          throw new Error(orderData.message || "Failed to create order on server");
+        }
+
+        const { orderId, amount, currency, keyId } = orderData.data;
+
+        // 2. Open Razorpay Modal
+        const options = {
+          key: keyId,
+          amount: amount,
+          currency: currency,
+          name: "Airbnb Stay Reservation",
+          description: `Booking #${bookingId}`,
+          order_id: orderId,
+          handler: async function (response) {
+            setStatus("Payment captured by Razorpay! Verifying with backend...", "info");
+
+            // 3. Signature Verification
+            const verifyRes = await fetch("http://localhost:5000/api/payments/verify", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                bookingId: bookingId,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature
+              })
+            });
+
+            const verifyData = await verifyRes.json();
+
+            if (verifyRes.ok && verifyData.success) {
+              setStatus("✓ Booking Confirmed! Redirecting back to your trips...", "success");
+              // Redirect back to frontend React status page after 1.5 seconds
+              setTimeout(() => {
+                window.location.href = `http://localhost:5173/booking/status/${bookingId}`;
+              }, 1500);
+            } else {
+              payBtn.disabled = false;
+              setStatus("Verification Failed: " + (verifyData.message || "Invalid signature"), "error");
+            }
+          },
+          prefill: {
+            name: "Aman Kumar Jha",
+            email: "guest@airbnb.com",
+            contact: "9876543210"
+          },
+          theme: {
+            color: "#ff385c"
+          }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.on("payment.failed", function (failResponse) {
+          payBtn.disabled = false;
+          setStatus("Payment Failed: " + failResponse.error.description, "error");
+        });
+
+        rzp.open();
+      } catch (err) {
+        payBtn.disabled = false;
+        setStatus("Error: " + err.message, "error");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  CUSTOMER
+  HOST
+  ADMIN
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  VILLA
+  ROOM
+  HOTEL
+  GUESTHOUSE
+  OTHER
+}
+
+enum PropertyStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum BookingStatus {
+  HOLD        // Temporary lock while on checkout / payment screen
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  EXPIRED     // Lock expired without payment
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  RAZORPAY
+}
+
+model User {
+  id                 String     @id @default(cuid())
+  name               String
+  email              String     @unique
+  phone              String?
+  avatar             String?
+  idCardPhoto        String?    // Photo ID of the host
+  role               UserRole   @default(CUSTOMER)
+  isVerified         Boolean    @default(false)
+  isActive           Boolean    @default(true)
+  hostVerifiedAt     DateTime?  // Timestamp when host OTP was approved
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  otpCodes           OTP[]
+  properties         Property[]
+  bookings           Booking[]
+  reviews            Review[]
+  payments           Payment[]
+  reviewedProperties Property[] @relation("PropertyReviewedBy")
+
+  @@index([email])
+  @@index([role])
+  @@index([isActive])
+}
+
+model OTP {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  type      String   @default("AUTH") // "AUTH" | "BECOME_HOST"
+  payload   Json?    // Holds listing details until OTP is confirmed
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([expiresAt])
+  @@index([type])
+}
+
+model Property {
+  id              String         @id @default(cuid())
+  title           String
+  description     String
+  propertyType    PropertyType
+  status          PropertyStatus @default(PENDING)
+
+  address         String
+  city            String
+  state           String
+  country         String         @default("India")
+  zipCode         String?        // Pincode
+  latitude        Float?
+  longitude       Float?
+
+  guests          Int
+  bedrooms        Int
+  beds            Int
+  bathrooms       Float
+
+  pricePerNight   Decimal        @db.Decimal(10, 2)
+  cleaningFee     Decimal        @default(0) @db.Decimal(10, 2)
+  serviceFee      Decimal        @default(0) @db.Decimal(10, 2)
+
+  isFeatured      Boolean        @default(false)
+  rejectionReason String?
+
+  reviewedAt      DateTime?
+  reviewedById    String?
+  reviewedBy      User?          @relation("PropertyReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  hostId          String
+  host            User           @relation(fields: [hostId], references: [id], onDelete: Cascade)
+
+  images          PropertyImage[]
+  amenities       PropertyAmenity[]
+  bookings        Booking[]
+  reviews         Review[]
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([hostId])
+  @@index([city])
+  @@index([state])
+  @@index([country])
+  @@index([propertyType])
+  @@index([status])
+  @@index([pricePerNight])
+  @@index([guests])
+  @@index([reviewedById])
+}
+
+model PropertyImage {
+  id         String   @id @default(cuid())
+  url        String
+  publicId   String?
+  isCover    Boolean  @default(false)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+}
+
+model Amenity {
+  id         String            @id @default(cuid())
+  name       String            @unique
+  icon       String?
+
+  properties PropertyAmenity[]
+
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+}
+
+model PropertyAmenity {
+  propertyId String
+  amenityId  String
+
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  amenity    Amenity  @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+
+  @@id([propertyId, amenityId])
+  @@index([amenityId])
+}
+
+model Booking {
+  id                 String        @id @default(cuid())
+  checkIn            DateTime
+  checkOut           DateTime
+  guests             Int
+
+  nights             Int
+  pricePerNight      Decimal       @db.Decimal(10, 2)
+  subtotal           Decimal       @db.Decimal(10, 2)
+  cleaningFee        Decimal       @default(0) @db.Decimal(10, 2)
+  serviceFee         Decimal       @default(0) @db.Decimal(10, 2)
+  totalAmount        Decimal       @db.Decimal(10, 2)
+
+  status             BookingStatus @default(HOLD)
+  holdExpiresAt      DateTime?     // Expiration time for 10-minute temporary lock
+  cancellationReason String?
+
+  userId             String
+  propertyId         String
+
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property           Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  payment            Payment?
+  review             Review?
+
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([propertyId])
+  @@index([status])
+  @@index([checkIn])
+  @@index([checkOut])
+  @@index([propertyId, status])
+  @@index([propertyId, checkIn, checkOut])
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  rating      Int
+  comment     String?
+  isPublished Boolean  @default(true) // <--- ADD THIS FIELD
+
+  userId      String
+  propertyId  String
+  bookingId   String?  @unique
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  booking     Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([propertyId])
+  @@index([rating])
+  @@index([isPublished])
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  amount            Decimal       @db.Decimal(10, 2)
+  currency          String        @default("INR")
+  method            PaymentMethod @default(RAZORPAY)
+  status            PaymentStatus @default(PENDING)
+
+  razorpayOrderId   String?       @unique
+  razorpayPaymentId String?       @unique
+  razorpaySignature String?
+
+  userId            String
+  bookingId         String        @unique
+
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  booking           Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}

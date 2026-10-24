@@ -1,0 +1,369 @@
+.status-page-wrapper {
+  max-width: 860px;
+  margin: 36px auto 80px auto;
+  padding: 0 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #222222;
+}
+
+.status-card-main {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* Header & Success Badge */
+.status-badge-header {
+  text-align: center;
+}
+
+.status-checkmark-circle {
+  width: 64px;
+  height: 64px;
+  background: #dcfce7;
+  color: #16a34a;
+  font-size: 32px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px auto;
+}
+
+.status-badge-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.status-badge-header p {
+  color: #64748b;
+  font-size: 15px;
+  margin: 0 0 20px 0;
+}
+
+.status-reference-pills {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.ref-pill {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: #475569;
+}
+
+.ref-pill strong {
+  color: #0f172a;
+  font-family: monospace;
+}
+
+.status-pill-confirmed {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #15803d;
+}
+
+.status-rule {
+  border: none;
+  height: 1px;
+  background: #f1f5f9;
+  margin: 32px 0;
+}
+
+/* Sections */
+.status-section {
+  margin-bottom: 28px;
+}
+
+.status-sec-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: #1e293b;
+}
+
+/* Property card */
+.status-property-card {
+  display: flex;
+  gap: 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px;
+  align-items: center;
+}
+
+.status-prop-img {
+  width: 150px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.status-prop-meta {
+  flex: 1;
+}
+
+.status-prop-category {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #ff385c;
+  letter-spacing: 0.5px;
+}
+
+.status-prop-meta h3 {
+  font-size: 18px;
+  margin: 4px 0 6px 0;
+}
+
+.status-prop-addr {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0 0 10px 0;
+}
+
+.status-stay-pills span {
+  display: inline-block;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 12px;
+  margin-right: 8px;
+  font-weight: 500;
+}
+
+/* Dates box */
+.status-dates-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px 28px;
+  text-align: center;
+}
+
+.block-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.date-block h4 {
+  font-size: 17px;
+  margin: 4px 0;
+}
+
+.date-block p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.date-arrow {
+  font-size: 20px;
+  color: #94a3b8;
+}
+
+/* Contacts grid */
+.status-contacts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.contact-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 16px 20px;
+}
+
+.host-box {
+  background: #fffdf5;
+  border-color: #fef08a;
+}
+
+.contact-role {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.contact-box h4 {
+  font-size: 16px;
+  margin: 4px 0 10px 0;
+}
+
+.contact-line {
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.host-badge {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #b45309;
+}
+
+/* Pricing Breakdown */
+.status-pricing-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px 22px;
+}
+
+.price-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #475569;
+}
+
+.price-rule {
+  border: none;
+  height: 1px;
+  background: #e2e8f0;
+  margin: 12px 0;
+}
+
+.total-price-line {
+  font-weight: 700;
+  font-size: 16px;
+  color: #0f172a;
+  margin-bottom: 0;
+}
+
+.total-amount-highlight {
+  color: #ff385c;
+  font-size: 18px;
+}
+
+/* Rules & Terms */
+.status-rules-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px 22px;
+}
+
+.rule-item {
+  margin-bottom: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.rule-item:last-child {
+  margin-bottom: 0;
+}
+
+.rule-item strong {
+  color: #0f172a;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.rule-item p {
+  color: #64748b;
+  margin: 0;
+}
+
+/* Footer buttons */
+.status-footer-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+  justify-content: center;
+}
+
+.status-primary-btn {
+  background: #ff385c;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.status-primary-btn:hover {
+  background: #e00b41;
+}
+
+.status-secondary-btn {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.status-loading-screen,
+.status-error-container {
+  max-width: 500px;
+  margin: 80px auto;
+  text-align: center;
+  padding: 40px;
+}
+
+.status-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f1f5f9;
+  border-top-color: #ff385c;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 680px) {
+  .status-property-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  .status-prop-img {
+    width: 100%;
+    height: 180px;
+  }
+  .status-contacts-grid {
+    grid-template-columns: 1fr;
+  }
+  .status-dates-box {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .date-arrow {
+    transform: rotate(90deg);
+  }
+}

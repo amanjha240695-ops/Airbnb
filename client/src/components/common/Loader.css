@@ -1,0 +1,76 @@
+.app-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 280px;
+  gap: 18px;
+}
+
+/* Optional full-screen coverage for page/route transitions */
+.app-loader-container.fullscreen-loader {
+  position: fixed;
+  inset: 0;
+  min-height: 100vh;
+  background: #ffffff;
+  z-index: 9999;
+}
+
+.loader-brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ff385c;
+  animation: logoBreath 1.5s ease-in-out infinite;
+}
+
+.loader-logo-icon {
+  stroke-width: 2.2;
+}
+
+.loader-logo-text {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #ff385c;
+  user-select: none;
+}
+
+.loader-progress-track {
+  width: 140px;
+  height: 4px;
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loader-progress-bar {
+  width: 45%;
+  height: 100%;
+  background: #ff385c;
+  border-radius: 9999px;
+  position: absolute;
+  animation: smoothSlide 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes logoBreath {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes smoothSlide {
+  0% {
+    left: -45%;
+  }
+  100% {
+    left: 100%;
+  }
+}
