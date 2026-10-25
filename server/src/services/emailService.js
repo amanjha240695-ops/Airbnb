@@ -1,17 +1,30 @@
 import nodemailer from "nodemailer";
 
+const smtpPort = Number(process.env.SMTP_PORT) || 465;
+const isSecure = smtpPort === 465;
+
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
+  port: smtpPort,
+  secure: isSecure, // 465 के लिए true (SSL direct)
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: process.env.SMTP_USER || process.env.EMAIL_USER,
+    pass: process.env.SMTP_PASS || process.env.EMAIL_PASS,
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 15000,
 });
 
 export const sendOtpEmail = async (toEmail, otpCode) => {
   try {
+    const sender = process.env.SMTP_USER || process.env.EMAIL_USER;
+
     const mailOptions = {
-      from: `"Airbnb Clone" <${process.env.SMTP_USER}>`,
+      from: `"Airbnb Clone" <${sender}>`,
       to: toEmail,
       subject: `Your Airbnb Verification Code: ${otpCode}`,
       html: `
@@ -32,6 +45,6 @@ export const sendOtpEmail = async (toEmail, otpCode) => {
     return info;
   } catch (error) {
     console.error("[SMTP Error] Failed to send email:", error.message);
-    return null;
+    throw error; // एरर छुपाएं मत, ताकि साफ़ पता चले
   }
 };
