@@ -1,18 +1,29 @@
 import nodemailer from "nodemailer";
 
+const smtpPort = Number(process.env.SMTP_PORT) || 465;
+const isSecure = smtpPort === 465;
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: false, // true for 465, false for 587
+  port: smtpPort,
+  secure: isSecure, // 465 ke liye true, 587 ke liye false
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: process.env.SMTP_USER || process.env.EMAIL_USER,
+    pass: process.env.SMTP_PASS || process.env.EMAIL_PASS,
   },
+  tls: {
+    rejectUnauthorized: false,
+  },
+  connectionTimeout: 10000, // 10s connection timeout
+  greetingTimeout: 10000,
+  socketTimeout: 15000,
 });
 
 export const sendHostVerificationOtpEmail = async (email, name, otpCode) => {
+  const senderEmail = process.env.SMTP_USER || process.env.EMAIL_USER;
+
   const mailOptions = {
-    from: `"Airbnb Security" <${process.env.SMTP_USER}>`,
+    from: `"Airbnb Security" <${senderEmail}>`,
     to: email,
     subject: `Your Host Verification Code: ${otpCode}`,
     html: `

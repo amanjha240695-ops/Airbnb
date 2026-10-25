@@ -3,9 +3,10 @@ import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { Navbar } from "./components/layout/Navbar";
-import { Footer } from "./components/layout/Footer";
+import Footer from "./components/layout/Footer"; // <-- Yahan se curly braces { } hata diye
 import { AppRoutes } from "./routes/AppRoutes";
 import "./App.css";
+
 function App() {
   return (
     <BrowserRouter>

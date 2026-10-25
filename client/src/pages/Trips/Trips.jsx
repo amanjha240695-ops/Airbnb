@@ -99,13 +99,8 @@ export default function Trips() {
         <h1>Trips</h1>
         <p>Manage your upcoming reservations, review past stays, and view booking receipts.</p>
       </div>
-      {/*empty state when nothing found*/}
-      <EmptyState
-  title="No trips booked... yet!"
-  subtitle="Time to dust off your bags and start planning your next great adventure."
-  actionLabel="Start searching"
-  actionPath="/"
-/>
+
+     
 
       {/* Filter Navigation Tabs */}
       <div className="trips-tabs">
