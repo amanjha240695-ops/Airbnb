@@ -1,62 +1,55 @@
 export const sendOtpEmail = async (toEmail, otpCode) => {
-  const apiKey = process.env.BREVO_API_KEY;
+  const serviceId = process.env.EMAILJS_SERVICE_ID;
+  const templateId = process.env.EMAILJS_TEMPLATE_ID;
+  const publicKey = process.env.EMAILJS_PUBLIC_KEY;
+  const privateKey = process.env.EMAILJS_PRIVATE_KEY;
 
-  if (!apiKey) {
-    console.error("❌ [Brevo Error] BREVO_API_KEY is missing in environment variables!");
-    throw new Error("Email service is not configured properly");
+  if (!serviceId || !templateId || !publicKey) {
+    console.error("❌ [EmailJS Error] Missing EmailJS configuration keys!");
+    throw new Error("Email service is not configured");
   }
 
-  // Brevo par verified sender email (fallback to amanjha240695@gmail.com)
-  const senderEmail = process.env.SMTP_USER || "amanjha240695@gmail.com";
+  // Fallback ke liye multiple common parameter keys provide kiye hain
+  const templateParams = {
+    to_email: toEmail.trim().toLowerCase(),
+    email: toEmail.trim().toLowerCase(),
+    otp_code: String(otpCode),
+    otp: String(otpCode),
+    to_name: toEmail.split("@")[0],
+  };
 
   const payload = {
-    sender: {
-      name: "Airbnb Security",
-      email: senderEmail,
-    },
-    to: [
-      {
-        email: toEmail,
-      },
-    ],
-    subject: `Your Airbnb Verification Code: ${otpCode}`,
-    htmlContent: `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
-        <div style="color: #ff385c; font-size: 26px; font-weight: 800; margin-bottom: 16px;">airbnb</div>
-        <h2 style="color: #1e293b; font-size: 20px; font-weight: 700; margin-bottom: 8px;">Confirm your email</h2>
-        <p style="color: #64748b; font-size: 14px; margin-bottom: 24px; line-height: 1.5;">Your verification code is below. Enter this code to complete your verification and access your Airbnb account.</p>
-        <div style="background-color: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 18px; text-align: center; margin-bottom: 24px;">
-          <span style="font-size: 34px; font-weight: 800; letter-spacing: 6px; color: #ff385c;">${otpCode}</span>
-        </div>
-        <p style="color: #94a3b8; font-size: 12px; margin: 0;">This code is valid for 10 minutes. If you did not request this, you can safely ignore this email.</p>
-      </div>
-    `,
+    service_id: serviceId,
+    template_id: templateId,
+    user_id: publicKey,
+    accessToken: privateKey || undefined,
+    template_params: templateParams,
   };
 
   try {
-    console.log(`[Brevo API] Initiating OTP dispatch to: ${toEmail}...`);
+    console.log(`[EmailJS API] Dispatching OTP (${otpCode}) to: ${toEmail}...`);
 
-    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
       method: "POST",
       headers: {
-        "accept": "application/json",
-        "api-key": apiKey,
-        "content-type": "application/json",
+        "Content-Type": "application/json",
+        "User-Agent": "Node.js/Airbnb-Backend",
       },
       body: JSON.stringify(payload),
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
 
     if (!response.ok) {
-      console.error("❌ [Brevo API Error Response]:", data);
-      throw new Error(data.message || "Failed to send email via Brevo API");
+      console.error("❌ [EmailJS API Error Status]:", response.status);
+      console.error("❌ [EmailJS API Error Body]:", responseText);
+      throw new Error(`Email delivery failed (${response.status}): ${responseText}`);
     }
 
-    console.log(`✅ [BREVO DELIVERED] Email successfully sent to ${toEmail}. MessageId:`, data.messageId);
-    return data;
+    console.log(`✅ [EMAIL DELIVERED] EmailJS Response:`, responseText || "OK");
+    return { success: true };
   } catch (error) {
-    console.error("❌ [Brevo Dispatch Error]:", error.message);
+    console.error("❌ [Dispatch Error]:", error.message);
     throw error;
   }
 };
