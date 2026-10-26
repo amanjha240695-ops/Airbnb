@@ -29,10 +29,7 @@ export const requestOtp = async (req, res, next) => {
 
     const otpCode = result.code || result.otp;
     if (otpCode) {
-      // Non-blocking dispatch taaki network timeout frontend ko crash/hang na kare
-      sendOtpEmail(cleanEmail, otpCode).catch((err) => {
-        console.warn("[Background Mail Warning]:", err.message);
-      });
+      await sendOtpEmail(cleanEmail, otpCode);
     }
 
     return successResponse(res, 200, "OTP sent successfully", {
@@ -84,10 +81,7 @@ export const requestRegistrationOtp = async (req, res, next) => {
 
     const otpCode = result.code || result.otp;
     if (otpCode) {
-      // Non-blocking dispatch
-      sendOtpEmail(cleanEmail, otpCode).catch((err) => {
-        console.warn("[Background Mail Warning]:", err.message);
-      });
+      await sendOtpEmail(cleanEmail, otpCode);
     }
 
     return successResponse(res, 200, "Verification OTP sent successfully", {
