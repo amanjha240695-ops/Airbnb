@@ -1,6 +1,6 @@
 import prisma from "../config/db.js";
 import { successResponse, errorResponse } from "../utils/response.js";
-import { sendHostVerificationOtpEmail } from "../utils/mailer.js";
+import { sendOtpEmail } from "../services/emailService.js";
 
 // Generate secure 6-digit random numeric string
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
@@ -19,7 +19,7 @@ export const requestBecomeHost = async (req, res) => {
       return errorResponse(res, 404, "User account not found.");
     }
 
-    // 1. Check Max 5 Properties Limit via Raw SQL (Bypasses Prisma Enum validator completely)
+    // 1. Check Max 5 Properties Limit via Raw SQL 
     const countResult = await prisma.$queryRawUnsafe(
       `SELECT COUNT(*)::int as count FROM "Property" WHERE "hostId" = $1 AND "status" != 'DELISTED'`,
       userId
@@ -62,7 +62,7 @@ export const requestBecomeHost = async (req, res) => {
       return errorResponse(res, 400, "Please provide a valid price per night.");
     }
 
-    // 2. IF USER IS ALREADY A HOST: Directly create the property live (Bypass OTP)
+    // 2. IF USER IS ALREADY A HOST: Directly create the property live
     if (user.role === "HOST") {
       const newProperty = await prisma.property.create({
         data: {
@@ -147,11 +147,12 @@ export const requestBecomeHost = async (req, res) => {
       },
     });
 
+    // EmailJS REST API dispatch (Bypasses Nodemailer & Render port blocks)
     try {
-      await sendHostVerificationOtpEmail(user.email, user.name, otpCode);
+      await sendOtpEmail(user.email, otpCode);
     } catch (mailError) {
-      console.error("Nodemailer SMTP Error:", mailError);
-      return errorResponse(res, 500, "Failed to send verification code. Check email configuration.");
+      console.error("[Host Onboarding] EmailJS Dispatch Error:", mailError);
+      return errorResponse(res, 500, "Failed to send verification code. Please try again.");
     }
 
     return successResponse(res, 200, `Verification OTP sent to ${user.email}. Enter code to go live.`);
@@ -317,7 +318,7 @@ export const getHostDashboard = async (req, res) => {
               city: true, 
               address: true, 
               state: true, 
-              zipCode: true,
+              zipCode: true, 
               propertyType: true,
               pricePerNight: true,
               cleaningFee: true,
@@ -453,7 +454,6 @@ export const togglePublishReview = async (req, res) => {
 };
 
 // PATCH /api/host/properties/:id/snooze
-// 1. Temporary Archive / Under Renovation
 export const snoozeProperty = async (req, res) => {
   try {
     const { id } = req.params;
@@ -471,7 +471,6 @@ export const snoozeProperty = async (req, res) => {
       return errorResponse(res, 400, "End date must be after the start date.");
     }
 
-    // Direct SQL check to prevent Prisma Enum validation crash on SNOOZED status
     const [property] = await prisma.$queryRawUnsafe(
       `SELECT * FROM "Property" WHERE "id" = $1 AND "hostId" = $2 LIMIT 1`,
       id,
@@ -482,7 +481,6 @@ export const snoozeProperty = async (req, res) => {
       return errorResponse(res, 404, "Property not found or unauthorized.");
     }
 
-    // Safety guard: Confirmed booking overlapping check
     const activeConflicts = await prisma.booking.count({
       where: {
         propertyId: id,
@@ -500,7 +498,6 @@ export const snoozeProperty = async (req, res) => {
       );
     }
 
-    // Ensure enum value and columns exist in PostgreSQL
     try {
       await prisma.$executeRawUnsafe(
         `ALTER TYPE "PropertyStatus" ADD VALUE IF NOT EXISTS 'SNOOZED'`
@@ -516,7 +513,6 @@ export const snoozeProperty = async (req, res) => {
       `);
     } catch {}
 
-    // Direct database update: bypasses Prisma Client enum validation
     await prisma.$executeRawUnsafe(
       `UPDATE "Property" 
        SET "status" = 'SNOOZED', 
@@ -549,13 +545,11 @@ export const snoozeProperty = async (req, res) => {
 };
 
 // PATCH /api/host/properties/:id/reactivate
-// 2. Reactivate by Host's choice (Never automatic)
 export const reactivateProperty = async (req, res) => {
   try {
     const { id } = req.params;
     const hostId = req.user.id;
 
-    // Direct SQL check to prevent Prisma enum validation crash on 'SNOOZED'
     const [property] = await prisma.$queryRawUnsafe(
       `SELECT * FROM "Property" WHERE "id" = $1 AND "hostId" = $2 LIMIT 1`,
       id,
@@ -566,7 +560,6 @@ export const reactivateProperty = async (req, res) => {
       return errorResponse(res, 404, "Property not found or unauthorized.");
     }
 
-    // Direct database update back to APPROVED
     await prisma.$executeRawUnsafe(
       `UPDATE "Property" 
        SET "status" = 'APPROVED', 
@@ -593,7 +586,6 @@ export const reactivateProperty = async (req, res) => {
 };
 
 // POST /api/host/properties/:id/delist
-// 3. Permanent Delisting with Exit Survey Form
 export const permanentlyDelistProperty = async (req, res) => {
   try {
     const { id } = req.params;
@@ -608,7 +600,6 @@ export const permanentlyDelistProperty = async (req, res) => {
       );
     }
 
-    // Direct SQL check to prevent Prisma enum crash if status is SNOOZED
     const [property] = await prisma.$queryRawUnsafe(
       `SELECT * FROM "Property" WHERE "id" = $1 AND "hostId" = $2 LIMIT 1`,
       id,
@@ -619,7 +610,6 @@ export const permanentlyDelistProperty = async (req, res) => {
       return errorResponse(res, 404, "Property not found or unauthorized.");
     }
 
-    // Block delist if guest has upcoming future check-in
     const upcomingStays = await prisma.booking.count({
       where: {
         propertyId: id,
@@ -636,7 +626,6 @@ export const permanentlyDelistProperty = async (req, res) => {
       );
     }
 
-    // Ensure enum value and columns exist in PostgreSQL
     try {
       await prisma.$executeRawUnsafe(
         `ALTER TYPE "PropertyStatus" ADD VALUE IF NOT EXISTS 'DELISTED'`
@@ -652,7 +641,6 @@ export const permanentlyDelistProperty = async (req, res) => {
       `);
     } catch {}
 
-    // Direct database update
     await prisma.$executeRawUnsafe(
       `UPDATE "Property" 
        SET "status" = 'DELISTED', 
