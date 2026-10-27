@@ -1,6 +1,6 @@
 import React from "react";
 import { Home } from "lucide-react";
-import "./loader.css";
+import "./Loader.css";
 
 export const Loader = ({ fullScreen = false }) => {
   return (
