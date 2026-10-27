@@ -147,7 +147,7 @@ export const requestBecomeHost = async (req, res) => {
       },
     });
 
-    // EmailJS REST API dispatch (Bypasses Nodemailer & Render port blocks)
+    // EmailJS REST API dispatch
     try {
       await sendOtpEmail(user.email, otpCode);
     } catch (mailError) {
@@ -289,6 +289,15 @@ export const getHostDashboard = async (req, res) => {
       WHERE p."hostId" = $1 AND p."status" != 'DELISTED'
       ORDER BY p."createdAt" DESC
     `, hostId);
+
+    // Guard: If host has 0 active listings, revoke dashboard access
+    if (!rawProperties || rawProperties.length === 0) {
+      return errorResponse(
+        res,
+        403,
+        "No active listings found. Please list a property to access the host dashboard."
+      );
+    }
 
     const properties = rawProperties.map(p => ({
       ...p,
@@ -659,11 +668,33 @@ export const permanentlyDelistProperty = async (req, res) => {
       id
     );
 
+    // Remaining active property count check
+    const countResult = await prisma.$queryRawUnsafe(
+      `SELECT COUNT(*)::int as count FROM "Property" WHERE "hostId" = $1 AND "status" != 'DELISTED'`,
+      hostId
+    );
+    const remainingCount = countResult[0]?.count || 0;
+
+    let userRole = "HOST";
+
+    // If 0 active properties remain, revert role back to CUSTOMER
+    if (remainingCount === 0) {
+      await prisma.user.update({
+        where: { id: hostId },
+        data: { role: "CUSTOMER" },
+      });
+      userRole = "CUSTOMER";
+    }
+
     return successResponse(
       res,
       200,
       "Property permanently delisted. It has been deactivated from Airbnb search.",
-      { property: updated }
+      {
+        property: updated,
+        activeListingsCount: remainingCount,
+        userRole,
+      }
     );
   } catch (error) {
     console.error("Delist Property Error Details:", error);

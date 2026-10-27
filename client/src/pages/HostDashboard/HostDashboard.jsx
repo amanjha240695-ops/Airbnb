@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { 
   getHostDashboardApi, 
@@ -36,7 +36,8 @@ import {
 import "./HostDashboard.css";
 
 export default function HostDashboard() {
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { user, setUser } = useAuth ? useAuth() : { user: null, setUser: () => {} };
   const [activeTab, setActiveTab] = useState("overview");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -71,6 +72,20 @@ export default function HostDashboard() {
 
   const [reactivatingId, setReactivatingId] = useState(null);
 
+  // Helper to safely revert role to CUSTOMER in storage & context
+  const revertToCustomer = () => {
+    const currentStored = localStorage.getItem("airbnb_user");
+    if (currentStored) {
+      try {
+        const parsed = JSON.parse(currentStored);
+        localStorage.setItem("airbnb_user", JSON.stringify({ ...parsed, role: "CUSTOMER" }));
+      } catch {}
+    }
+    if (setUser) {
+      setUser((prev) => (prev ? { ...prev, role: "CUSTOMER" } : null));
+    }
+  };
+
   // Silent sync without full-screen loading spinner
   const refreshDashData = async () => {
     try {
@@ -81,6 +96,10 @@ export default function HostDashboard() {
       }
     } catch (err) {
       console.error("Dashboard refresh error:", err);
+      if (err.response?.status === 403) {
+        revertToCustomer();
+        navigate("/");
+      }
     }
   };
 
@@ -91,6 +110,11 @@ export default function HostDashboard() {
       setData(res.data?.data || res.data);
     } catch (err) {
       console.error("Dashboard initial error:", err);
+      if (err.response?.status === 403) {
+        revertToCustomer();
+        alert("You currently have 0 active listings. Redirecting to home...");
+        navigate("/");
+      }
     } finally {
       setLoading(false);
     }
@@ -120,7 +144,6 @@ export default function HostDashboard() {
       setPriceUpdating(true);
       await updateListingPriceApi(propertyId, priceForm);
 
-      // Instant optimistic state update
       setData((prev) => {
         if (!prev) return prev;
         return {
@@ -172,7 +195,6 @@ export default function HostDashboard() {
     try {
       setSnoozeSubmitting(true);
 
-      // 1. Instant Optimistic UI Update: immediately mark as SNOOZED
       setData((prev) => {
         if (!prev) return prev;
         return {
@@ -208,7 +230,6 @@ export default function HostDashboard() {
     try {
       setReactivatingId(propertyId);
 
-      // 1. Instant Optimistic UI Update: immediately mark as APPROVED
       setData((prev) => {
         if (!prev) return prev;
         return {
@@ -257,10 +278,10 @@ export default function HostDashboard() {
     try {
       setDelistSubmitting(true);
 
-      // 1. Instant Optimistic UI Update: remove property from local state
+      const remainingProps = (data?.properties || []).filter((p) => p.id !== targetPropertyId);
+
       setData((prev) => {
         if (!prev) return prev;
-        const remainingProps = (prev.properties || []).filter((p) => p.id !== targetPropertyId);
         return {
           ...prev,
           properties: remainingProps,
@@ -279,8 +300,17 @@ export default function HostDashboard() {
       setDelistForm({ category: "PERSONAL_RESIDENCE", reason: "" });
 
       const res = await permanentlyDelistPropertyApi(targetPropertyId, delistForm);
-      setStatusNotice({ text: res.data?.message || "Listing permanently delisted.", type: "success" });
+      const resPayload = res.data?.data || {};
 
+      // If no properties left, revert role to CUSTOMER and redirect to home
+      if (resPayload.userRole === "CUSTOMER" || resPayload.activeListingsCount === 0 || remainingProps.length === 0) {
+        revertToCustomer();
+        alert("All your properties have been delisted. Your account is now back to a standard guest profile.");
+        navigate("/");
+        return;
+      }
+
+      setStatusNotice({ text: res.data?.message || "Listing permanently delisted.", type: "success" });
       await refreshDashData();
     } catch (err) {
       setStatusNotice({ text: err.response?.data?.message || "Failed to delist property", type: "error" });
