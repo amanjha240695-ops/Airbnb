@@ -181,6 +181,7 @@
   width: 100%;
   padding: 32px 28px;
   text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .otp-modal-card h2 {
@@ -261,9 +262,54 @@
   border: 1px solid #a7f3d0;
 }
 
-@media (max-width: 640px) {
+/* ==========================================================================
+   Mobile & Tablet Adaptive Enhancements
+   ========================================================================== */
+@media (max-width: 768px) {
+  .host-onboard-page {
+    padding: 24px 16px 80px;
+  }
+
+  .host-onboard-header h1 {
+    font-size: 26px;
+  }
+
+  .host-form-card {
+    padding: 24px 18px;
+  }
+
   .fields-grid-2,
   .fields-grid-3 {
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .form-footer-action {
+    text-align: stretch;
+  }
+
+  .btn-go-live {
+    width: 100%;
+    padding: 14px 20px;
+  }
+
+  .otp-modal-card {
+    padding: 24px 18px;
+  }
+
+  .otp-code-input {
+    font-size: 24px;
+    letter-spacing: 6px;
+  }
+
+  .otp-modal-buttons {
+    flex-direction: column-reverse;
+  }
+
+  .btn-modal-cancel,
+  .btn-modal-confirm {
+    width: 100%;
+    padding: 12px;
+    text-align: center;
   }
 }
